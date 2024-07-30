@@ -2,18 +2,18 @@
 import base64
 import json
 import os
-import platform
 import sys
-import threading
 import time
 import webbrowser
+from platform import release
+from threading import Thread
 from tkinter import Tk, ttk, Menu, Label, Entry, messagebox, Button, Text, END
 from tkinter.filedialog import askdirectory
 
 
 def OSVersion():
     try:
-        OSv = platform.release()
+        OSv = release()
     except:
         OSv = "0"
     if not OSv.isdigit():
@@ -33,62 +33,62 @@ def icoToPy(icoFilePath):
 
 
 class MyGui:
-    def __init__(self, init_window_name, root_dir):
-        self.root_dir = root_dir
-        self.init_window_name = init_window_name
+    def __init__(self, _init_window, _root_dir):
+        self.root_dir = _root_dir
+        self.init_window = _init_window
         self.version_info = "<br>Powered by 文件目录制作工具"
-        self.menubar = Menu(self.init_window_name)
+        self.menubar = Menu(self.init_window)
         self.topMenu = Menu(self.menubar, tearoff=False)
         self.topMenu.add_command(label="退出", command=self.__quit)
         self.menubar.add_cascade(label="文件", menu=self.topMenu)
         self.topMenu.add_separator()
         self.topMenu.add_command(label="关于", command=self.__about)
-        self.init_window_name.config(menu=self.menubar)
-        self.rootDir = Label(self.init_window_name, text="  待索引目录：", justify="right")
+        self.init_window.config(menu=self.menubar)
+        self.rootDir = Label(self.init_window, text="  待索引目录：", justify="right")
         self.rootDir.grid(row=1, column=1)
-        self.input_rootDir = Entry(self.init_window_name, width=30)
+        self.input_rootDir = Entry(self.init_window, width=30)
         self.input_rootDir.grid(row=1, column=2)
-        self.rootDir_button = Button(self.init_window_name, text="选择目录", bg="lightgray", width=8, height=1,
+        self.rootDir_button = Button(self.init_window, text="选择目录", bg="lightgray", width=8, height=1,
                                      command=self.__chooseRootDir, justify="right")
         self.rootDir_button.grid(row=1, column=3)
-        self.saveDir = Label(self.init_window_name, text="  保存索引到：", justify="right")
+        self.saveDir = Label(self.init_window, text="  保存索引到：", justify="right")
         self.saveDir.grid(row=2, column=1)
-        self.input_saveDir = Entry(self.init_window_name, width=30)
+        self.input_saveDir = Entry(self.init_window, width=30)
         self.input_saveDir.grid(row=2, column=2)
-        self.saveDir_button = Button(self.init_window_name, text="选择目录", bg="lightgray", width=8, height=1,
+        self.saveDir_button = Button(self.init_window, text="选择目录", bg="lightgray", width=8, height=1,
                                      command=self.__chooseSaveDir, justify="right")
         self.saveDir_button.grid(row=2, column=3)
-        self.rootName = Label(self.init_window_name, text="  标题名称：", justify="right")
+        self.rootName = Label(self.init_window, text="  标题名称：", justify="right")
         self.rootName.grid(row=3, column=1)
-        self.input_rootName = Entry(self.init_window_name, width=30)
+        self.input_rootName = Entry(self.init_window, width=30)
         self.input_rootName.grid(row=3, column=2)
         self.input_rootName.insert(0, "我的目录")
-        self.authorName = Label(self.init_window_name, text="  作者：", justify="right")
+        self.authorName = Label(self.init_window, text="  作者：", justify="right")
         self.authorName.grid(row=4, column=1)
-        self.input_authorName = Entry(self.init_window_name, width=30)
+        self.input_authorName = Entry(self.init_window, width=30)
         self.input_authorName.grid(row=4, column=2)
         self.input_authorName.insert(0, "无名")
-        self.stop_button = Button(self.init_window_name, text="停止", bg="lightblue", width=8, height=1,
+        self.stop_button = Button(self.init_window, text="停止", bg="lightblue", width=8, height=1,
                                   command=self.__stop, justify="right")
         self.stop_button.grid(row=3, column=3, rowspan=2)
-        self.gen_button = Button(self.init_window_name, text="制作索引", bg="lightblue", width=8, height=1,
+        self.gen_button = Button(self.init_window, text="制作索引", bg="lightblue", width=8, height=1,
                                  command=self.__start, justify="right")
         self.gen_button.grid(row=3, column=3, rowspan=2)
-        self.t2 = Label(self.init_window_name, text=" ", justify="right")  # 空行
+        self.t2 = Label(self.init_window, text=" ", justify="right")  # 空行
         self.t2.grid(row=6, column=1)
-        self.log = Text(self.init_window_name, width=50, height=10, bd=1)  # 日志文本框
+        self.log = Text(self.init_window, width=50, height=10, bd=1)  # 日志文本框
         self.log.grid(row=7, column=1, columnspan=3)
-        self.t2 = Label(self.init_window_name, text=" ", justify="right")  # 空行
+        self.t2 = Label(self.init_window, text=" ", justify="right")  # 空行
         self.t2.grid(row=8, column=1)
-        self.progressbar_one = ttk.Progressbar(self.init_window_name, length=400)
+        self.progressbar_one = ttk.Progressbar(self.init_window, length=400)
         self.progressbar_one.grid(row=9, column=1, columnspan=3)
 
     # 设置窗口
     def set_init_window(self):
-        self.init_window_name.title("文件目录制作工具")  # 窗口名
-        # self.init_window_name.geometry('850x750+200+2')  #窗口大小，+10 +10 定义窗口弹出时的默认展示位置
-        # self.init_window_name["bg"] = "pink"             #窗口背景色，其他背景色见：blog.csdn.net/chl0000/article/details/7657887
-        self.init_window_name.attributes("-alpha", 0.95)    #虚化，值越小虚化程度越高
+        self.init_window.title("文件目录制作工具")  # 窗口名
+        # self.init_window.geometry('850x750+200+2')  #窗口大小，+10 +10 定义窗口弹出时的默认展示位置
+        # self.init_window["bg"] = "pink"             #窗口背景色，其他背景色见：blog.csdn.net/chl0000/article/details/7657887
+        self.init_window.attributes("-alpha", 0.95)  # 虚化，值越小虚化程度越高
         # 设置窗口大小
         width = 400
         if int(OSVersion()) == -1:
@@ -98,16 +98,16 @@ class MyGui:
         else:
             height = 300
         # 获取屏幕尺寸以计算布局参数，使窗口居屏幕中央
-        screenwidth = self.init_window_name.winfo_screenwidth()
-        screenheight = self.init_window_name.winfo_screenheight()
-        alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - 50 - height) / 2)
-        print(screenwidth, screenheight, alignstr)
-        self.init_window_name.geometry(alignstr)
+        screenwidth = self.init_window.winfo_screenwidth()
+        screenheight = self.init_window.winfo_screenheight()
+        position = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - 50 - height) / 2)
+        print(screenwidth, screenheight, position)
+        self.init_window.geometry(position)
         self.__setIcon()
-        self.init_window_name.protocol("WM_DELETE_WINDOW", self.__quit)
+        self.init_window.protocol("WM_DELETE_WINDOW", self.__quit)
 
     def __quit(self):
-        # self.init_window_name.quit()  # TK的退出方法，可能无法结束其他线程，所以还要想办法让其他所有线程结束。
+        # self.init_window.quit()  # TK的退出方法，可能无法结束其他线程，所以还要想办法让其他所有线程结束。
         self.pause = True
         if messagebox.askokcancel("退出", "确认要退出？"):
             self.__stop(confirm=False)
@@ -127,7 +127,7 @@ class MyGui:
         else:  # 不确认直接退出
             self.pause = False
             self.forceStop = True
-            self.init_window_name.after(200, self.init_window_name.quit())  # tk主线程不能用time.sleep()，否则会挂死整个进程
+            self.init_window.after(200, self.init_window.quit())  # tk主线程不能用time.sleep()，否则会挂死整个进程
             '''
             暴力结束进程的方法非不得已不使用
             pid = os.getpid()
@@ -140,7 +140,7 @@ class MyGui:
         print(tmpIcoPath)
         with open(tmpIcoPath, "wb+") as tmp:
             tmp.write(base64.b64decode(img))  # 写入到临时文件中
-            self.init_window_name.iconbitmap(tmpIcoPath)  # 设置图标
+            self.init_window.iconbitmap(tmpIcoPath)  # 设置图标
             tmp.close()
         os.remove(tmpIcoPath)
 
@@ -161,18 +161,18 @@ class MyGui:
         savePath = self.input_saveDir.get()
         rootName = self.input_rootName.get()
         authorName = self.input_authorName.get()
-        if self.__emptyInput("待索引目录", filePath) or self.__emptyInput("保存索引目录", savePath) or self.__emptyInput("标题名称", rootName) or self.__emptyInput(
-                "作者信息", authorName):
+        if self.__emptyInput("待索引目录", filePath) or self.__emptyInput("保存索引目录", savePath) or self.__emptyInput(
+                "标题名称", rootName) or self.__emptyInput("作者信息", authorName):
             return
         else:
-            self.start_bar_thread = threading.Thread(target=self.__progressbar, args=())
+            self.start_bar_thread = Thread(target=self.__progressbar, args=())
             self.start_bar_thread.start()
-            self.mainThread = threading.Thread(target=self.__genHtmlIndex, args=(filePath, savePath, rootName, authorName))
+            self.mainThread = Thread(target=self.__genHtmlIndex, args=(filePath, savePath, rootName, authorName))
             self.mainThread.start()
 
     def __progressbar(self):
         self.progressbar_one.config(maximum=100, value=0)
-        self.barThread = threading.Thread(target=self.__showBar, args=())
+        self.barThread = Thread(target=self.__showBar, args=())
         self.barThread.start()
 
     def __showBar(self):
@@ -266,10 +266,10 @@ class MyGui:
                                 print("line-265:", e)
                             self.fileNum += 1
                             index_t = {"dirName": df, "dirURL": dirPath_t, "hasSubDirs": "false"}
-                        rIndex["SubDirs"].append(index_t)
-                        try:  # 递归处理，如果是目录则继续递归子目录，如果是文件直接附加空子目录结束递归
-                            self.__traversalDir(dirPath_t, rIndex["SubDirs"][i])
-                        except Exception as e: # 针对无法访问的系统隐藏文件夹（比如“System Volume Information”）直接跳过
+                        try:
+                            rIndex["SubDirs"].append(index_t)
+                            self.__traversalDir(dirPath_t, rIndex["SubDirs"][i])   # 递归处理，如果是目录则继续递归子目录，如果是文件直接附加空子目录结束递归
+                        except Exception as e:  # 针对无法访问的系统隐藏文件夹（比如“System Volume Information”）直接跳过
                             print("line-272:", e)
                         i += 1
                     else:
@@ -431,7 +431,7 @@ class MyGui:
                 except Exception as e:
                     print("line-366:", e)
                     messagebox.showerror("错误：", "请确认保存索引的目录是否正确！" + str(e))
-                    self.log.insert("end", e)
+                    self.log.insert("end", str(e))
                     self.stop_button.grid_remove()
                     self.gen_button.grid()
                 else:
@@ -443,8 +443,8 @@ class MyGui:
                     self.pct = 100
                     print(htmlFilePath)
                     messagebox.showinfo("成功", "目录索引制作成功！索引文件保存在：" + htmlFilePath)
-                    os.system("start " + savePath)
-                    os.system(htmlFilePath)
+                    os.system('start " " "' + savePath + '"')
+                    os.system('"' + htmlFilePath + '"')
                     # webbrowser.open_new_tab(htmlFilePath)
                     self.stop_button.grid_remove()
                     self.gen_button.grid()
@@ -454,10 +454,10 @@ class MyGui:
         print("genHtmlIndex finished.")
 
 
-def gui_start(root_dir):
+def gui_start(_dir):
     init_window = Tk()  # 实例化出一个父窗口
     init_window.resizable(False, False)
-    window = MyGui(init_window, root_dir)
+    window = MyGui(init_window, _dir)
     # 设置根窗口默认属性
     window.set_init_window()
     init_window.mainloop()  # 父窗口进入事件循环，可以理解为保持窗口运行，否则界面不展示
