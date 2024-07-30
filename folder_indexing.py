@@ -17,7 +17,7 @@ def OSVersion():
     except:
         OSv = "0"
     if not OSv.isdigit():
-        OSv = "0"
+        OSv = "-1"
     print("操作系统版本号：", OSv)
     return OSv
 
@@ -91,7 +91,9 @@ class MyGui:
         self.init_window_name.attributes("-alpha", 0.95)    #虚化，值越小虚化程度越高
         # 设置窗口大小
         width = 400
-        if int(OSVersion()) >= 7:
+        if int(OSVersion()) == -1:
+            height = 310
+        elif int(OSVersion()) >= 7:
             height = 308
         else:
             height = 300
