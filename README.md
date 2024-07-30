@@ -10,6 +10,7 @@ It can be run under any OS with python ENV.
 【Notes】：
 1、Running on multi platform: it can be run under win7 and newer windows systems, and systems older than windowsXP( include windowsXP) is not tested. It can run under linux, but the line to set program icon should be commented. Because icon file format on linux differs from windows. And I did not make a special ico file for linux.
 2、Packaging: I have tried to package the code by pyinstaller, but it is very annoying. Almost every antivirus software makes virus alert, so I didn't spend much more time on it. 
+
 【说明】：
 1、关于跨平台问题：Windows平台Win7之后应该都没问题，XP及之前的系统没试过。Linux系统的图标文件格式与Windows下不同，所以用内置的ico文件无法设置程序图标，我也没精力专门做一个Linux下的图标文件，所以如果想在Linux下运行，把设置图标的那行代码注释掉就行了；
 2、打包发布：我使用Pyinstaller打包过此程序，但总是被各种杀毒软件误报为病毒，所以不想再折腾了，如果有人想打包就自己打吧，反正也没啥技术难度。
